@@ -6,17 +6,16 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import LoginSignup from './pages/LoginSignup';
 import Home from './pages/Home';
-import Orders from './pages/Orders';
+import EarningsDashboard from './pages/EarningsDashboard';
 import Profile from './pages/Profile';
+import MyDay from './pages/MyDay';
+import Learning from './pages/Learning';
 import Navigation from './pages/Navigation';
 function App() {
   return (
     <Router>
       <Box sx={{ minHeight: '100vh', bgcolor: '#fafafa', pb: 7 }}>
-        <Box sx={{ width: '100%', bgcolor: '#ffecb3', color: '#795548', textAlign: 'center', py: 1, fontWeight: 600, fontSize: 16, letterSpacing: 1 }}>
-          MOBILE PREVIEW
-        </Box>
-        <AppBar position="fixed" color="primary" sx={{ top: 32, left: 0, right: 0 }}>
+  <AppBar position="fixed" color="primary" sx={{ top: 0, left: 0, right: 0 }}>
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Porter App
@@ -27,8 +26,10 @@ function App() {
           <Routes>
             <Route path="/" element={<LoginSignup />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/orders" element={<Orders />} />
+            <Route path="/earnings" element={<EarningsDashboard />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/myday" element={<MyDay />} />
+            <Route path="/learning" element={<Learning />} />
           </Routes>
         </Box>
         {/* Only show Navigation on logged-in pages */}

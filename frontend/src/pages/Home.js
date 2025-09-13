@@ -1,11 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { Container, Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Container, Box, Typography, Card, CardContent, Button, Avatar } from '@mui/material';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 
 // Gemini API endpoint and key (for demo, use env/backend for production)
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 const GEMINI_API_KEY = '';
 
 function Home() {
+  const navigate = useNavigate();
   const [input, setInput] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
@@ -236,9 +240,44 @@ const DRIVER_CONTEXT = {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ pt: 2, pb: 10 }}>
-      <Typography variant="h5" fontWeight={600} mb={1}>Home</Typography>
-      <Typography mb={3}>Welcome to Porter App!</Typography>
+    <Container maxWidth="sm" sx={{ pt: 2, pb: 10, position: 'relative', minHeight: '100vh',
+      background: 'linear-gradient(135deg, #e3f2fd 0%, #fffde7 100%)',
+      borderRadius: 6,
+      boxShadow: '0 8px 32px rgba(44,62,80,0.12)',
+      px: { xs: 1, sm: 3 },
+      transition: 'background 0.5s'
+    }}>
+      {/* Logout Button */}
+      <button
+        onClick={() => navigate('/')}
+        style={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          background: 'linear-gradient(90deg, #ff9800 0%, #ffd600 100%)',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '16px',
+          padding: '10px 24px',
+          fontWeight: 700,
+          fontSize: '18px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          cursor: 'pointer',
+          zIndex: 2000,
+          letterSpacing: 1
+        }}
+        aria-label="Logout"
+      >
+        Logout
+      </button>
+      <Box textAlign="center" mt={4} mb={2}>
+        <Typography variant="h3" fontWeight={900} color="#1976d2" mb={1} sx={{ letterSpacing: 2, textShadow: '0 2px 8px #90caf9' }}>
+          Welcome to Porter App
+        </Typography>
+        <Typography variant="h6" color="text.secondary" mb={2} sx={{ fontWeight: 500, fontSize: 20 }}>
+          Your smart assistant for business & safety
+        </Typography>
+      </Box>
       <Box mt={2}>
         <Box display="flex" gap={1} mt={1}>
           <input
@@ -246,41 +285,41 @@ const DRIVER_CONTEXT = {
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="Type a message..."
-            style={{ flex: 1, padding: '12px', fontSize: '16px', borderRadius: '8px', border: '1px solid #ccc' }}
+            style={{ flex: 1, padding: '16px', fontSize: '18px', borderRadius: '12px', border: '1.5px solid #90caf9', boxShadow: '0 2px 8px #e3f2fd', background: '#fff' }}
           />
-          <button onClick={handleSend} disabled={loading || !input} style={{ padding: '12px 20px', borderRadius: '8px', background: '#1976d2', color: '#fff', border: 'none', fontWeight: 500 }}>
+          <button onClick={handleSend} disabled={loading || !input} style={{ padding: '16px 28px', borderRadius: '12px', background: 'linear-gradient(90deg, #1976d2 0%, #64b5f6 100%)', color: '#fff', border: 'none', fontWeight: 700, fontSize: 18, boxShadow: '0 2px 8px #90caf9' }}>
             {loading ? 'Sending...' : 'Send'}
           </button>
         </Box>
         {response && (
-          <Box mt={2} bgcolor="#e3f2fd" p={2} borderRadius={2}>
-            <Typography variant="body1">{response}</Typography>
+          <Box mt={2} bgcolor="#e3f2fd" p={2} borderRadius={3} boxShadow={2}>
+            <Typography variant="body1" sx={{ fontSize: 18 }}>{response}</Typography>
           </Box>
         )}
       </Box>
-      {/* Floating Sahayata button */}
-      <button
-        onClick={startHelpFlow}
-        style={{
-          position: 'fixed',
-          bottom: 32,
-          right: 32,
-          zIndex: 1000,
-          background: '#d32f2f',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '50%',
-          width: '64px',
-          height: '64px',
-          fontSize: '28px',
-          fontWeight: 700,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
-        }}
-        aria-label="Sahayata"
-      >
-        🛡️
-      </button>
-      {/* Emergency assistant dialog */}
+      {/* Sahayata and Saathi Person Cards */}
+      <Box display="flex" gap={4} justifyContent="center" mt={5} mb={4}>
+        <Card sx={{ width: 220, boxShadow: 8, bgcolor: 'rgba(255,255,255,0.98)', textAlign: 'center', borderRadius: 5, transition: 'box-shadow 0.3s', '&:hover': { boxShadow: 16 } }}>
+          <CardContent>
+            <Avatar sx={{ bgcolor: '#388e3c', width: 80, height: 80, mx: 'auto', mb: 2, boxShadow: 3 }}>
+              <BusinessCenterIcon sx={{ fontSize: 48 }} />
+            </Avatar>
+            <Typography variant="h5" fontWeight={900} color="success.main" mb={1} sx={{ letterSpacing: 1 }}>Saathi</Typography>
+            <Typography variant="body1" color="text.secondary" mb={2} sx={{ fontWeight: 600, fontSize: 18 }}>Business Manager</Typography>
+            <Button variant="contained" color="success" fullWidth onClick={startSaathiFlow} sx={{ fontWeight: 700, fontSize: 18, borderRadius: 3, py: 1 }}>Talk to Saathi</Button>
+          </CardContent>
+        </Card>
+        <Card sx={{ width: 220, boxShadow: 8, bgcolor: 'rgba(255,255,255,0.98)', textAlign: 'center', borderRadius: 5, transition: 'box-shadow 0.3s', '&:hover': { boxShadow: 16 } }}>
+          <CardContent>
+            <Avatar sx={{ bgcolor: '#1976d2', width: 80, height: 80, mx: 'auto', mb: 2, boxShadow: 3 }}>
+              <EmojiPeopleIcon sx={{ fontSize: 48 }} />
+            </Avatar>
+            <Typography variant="h5" fontWeight={900} color="primary" mb={1} sx={{ letterSpacing: 1 }}>Sahayak</Typography>
+            <Typography variant="body1" color="text.secondary" mb={2} sx={{ fontWeight: 600, fontSize: 18 }}>Friend Persona</Typography>
+            <Button variant="contained" color="primary" fullWidth onClick={startHelpFlow} sx={{ fontWeight: 700, fontSize: 18, borderRadius: 3, py: 1 }}>Talk to Sahayak</Button>
+          </CardContent>
+        </Card>
+      </Box>
       {showHelp && (
         <Box position="fixed" top={0} left={0} width="100vw" height="100vh" bgcolor="rgba(0,0,0,0.5)" zIndex={2000} display="flex" alignItems="center" justifyContent="center">
           <Box bgcolor="#fff" p={4} borderRadius={3} minWidth={320} boxShadow={3}>
@@ -293,28 +332,6 @@ const DRIVER_CONTEXT = {
           </Box>
         </Box>
       )}
-      {/* Floating Saathi button */}
-      <button
-        onClick={startSaathiFlow}
-        style={{
-          position: 'fixed',
-          bottom: 110,
-          right: 32,
-          zIndex: 1000,
-          background: '#388e3c',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '50%',
-          width: '64px',
-          height: '64px',
-          fontSize: '28px',
-          fontWeight: 700,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
-        }}
-        aria-label="Saathi"
-      >
-        💼
-      </button>
       {/* Saathi assistant dialog */}
       {showSaathi && (
         <Box position="fixed" top={0} left={0} width="100vw" height="100vh" bgcolor="rgba(0,0,0,0.5)" zIndex={2000} display="flex" alignItems="center" justifyContent="center">
