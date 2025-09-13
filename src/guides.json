@@ -1,0 +1,56 @@
+[
+  {
+    "topic": "upload documents to digilocker",
+    "title": "How to Upload Documents to DigiLocker",
+    "summary": "Upload your driving license, RC, and other vehicle documents to :contentReference[oaicite:0]{index=0} in just a few steps.",
+    "steps": [
+      "Open the DigiLocker app or website.",
+      "Log in using your mobile number and OTP.",
+      "Go to the 'Upload Documents' section.",
+      "Select the document file from your device.",
+      "Click 'Upload' and confirm to save it."
+    ],
+    "video": "https://www.youtube.com/embed/bHFvKToEvj8"
+  },
+  {
+    "topic": "contest challan",
+    "title": "How to Contest a Challan Online",
+    "summary": "If you think your challan is wrong, you can dispute it online easily.",
+    "steps": [
+      "Visit your state traffic police website.",
+      "Navigate to the 'eChallan' section.",
+      "Enter your challan number and vehicle number.",
+      "Click 'Dispute' and upload any proof documents.",
+      "Submit and track the status online."
+    ],
+    "video": "https://www.youtube.com/embed/V3UpCVn2gxQ"
+  },
+  {
+    "topic": "vehicle insurance",
+    "title": "Basics of Vehicle Insurance",
+    "summary": "Understand the importance and types of vehicle insurance.",
+    "steps": [
+      "Vehicle insurance protects you from financial losses.",
+      "Types: Third-party, Comprehensive, and Own-damage.",
+      "Renew insurance before expiry to avoid penalties.",
+      "Keep a soft copy of your insurance in DigiLocker.",
+      "Always inform your insurer after an accident."
+    ],
+    "video": "https://www.youtube.com/embed/9Iqr0nr-V1g"
+  },
+  {
+    "topic": "government schemes for drivers",
+    "title": "Govt Schemes for Gig Workers",
+    "summary": "Know about financial support schemes for gig workers/drivers.",
+    "steps": [
+      "Register on :contentReference[oaicite:1]{index=1} portal with Aadhaar.",
+      "Eligible for insurance and pension benefits.",
+      "Check state transport department websites.",
+      "Look for subsidies on electric vehicles.",
+      "Use :contentReference[oaicite:2]{index=2} for skill development training."
+    ],
+    "video": "https://www.youtube.com/embed/fQUUk5B1yMo"
+  }
+]
+
+
