@@ -1,6 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { Container, Box, Typography } from '@mui/material';
 
+// Gemini API endpoint and key (for demo, use env/backend for production)
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const GEMINI_API_KEY = '';
+
 function Home() {
   const [input, setInput] = useState('');
   const [response, setResponse] = useState('');
@@ -56,57 +60,164 @@ function Home() {
     setShowHelp(true);
     setHelpStep(0);
     setHelpTranscript('');
-    speak('Sahayata mode shuru ho gaya hai. Kripya batayein kya samasya hai?', () => {
+    let active = true;
+    const conversationLoop = () => {
+      if (!active) return;
       setHelpStep(1);
       let timeoutId;
       const stopListening = () => {
+        if (!active) return;
         if (timeoutId) clearTimeout(timeoutId);
-        setHelpStep(3); // New step for no speech
+        setHelpStep(3);
         speak('Mujhe kuch sunayi nahi diya. Kripya dobara koshish karein ya button dabayein.', () => {
-          setTimeout(() => setShowHelp(false), 4000);
+          setTimeout(() => { setShowHelp(false); active = false; }, 4000);
         });
       };
-      timeoutId = setTimeout(stopListening, 10000); // 10s timeout
-      startListening((transcript) => {
+      timeoutId = setTimeout(stopListening, 10000);
+      startListening(async (transcript) => {
+        if (!active) return;
         if (timeoutId) clearTimeout(timeoutId);
         setHelpTranscript(transcript);
-        speak('Aapki samasya mil gayi. Hamari team turant madad karegi. Kripya shaant rahein.', () => {
-          setHelpStep(2);
-          setTimeout(() => setShowHelp(false), 4000);
+        speak('Aapne kaha: ' + transcript, async () => {
+          try {
+            const prompt = `Give to-do for this. Always: short, clear Hindi. Avoid technical words, use simple language. User: ${transcript}`;
+            const geminiRes = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+            const geminiData = await geminiRes.json();
+            const geminiReply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Madad aa rahi hai, shaant rahiye.';
+            speak(geminiReply, () => {
+              setHelpStep(2);
+              // Continue conversation unless dialog closed
+              setTimeout(() => { if (active) conversationLoop(); }, 1000);
+            });
+          } catch (err) {
+            speak('AI se sampark nahi ho paaya. Kripya dobara koshish karein.', () => {
+              setHelpStep(3);
+              setTimeout(() => { setShowHelp(false); active = false; }, 4000);
+            });
+          }
         });
       }, stopListening);
-    });
+    };
+    speak('Sahayata mode shuru ho gaya hai. Kripya batayein kya samasya hai?', conversationLoop);
   };
 
   // Saathi assistant flow
   const startSaathiFlow = () => {
     setShowSaathi(true);
+    setSaathiTranscript('');
+    setSaathiResponse('');
+    setShowSaathi(true);
     setSaathiStep(0);
     setSaathiTranscript('');
     setSaathiResponse('');
-    speak('Namaste! Main aapka business manager Saathi hoon. Aap apna sawaal pooch sakte hain, jaise "Aaj ka kharcha kaat ke kitna kamaya?"', () => {
+    let active = true;
+    let listening = false;
+    const conversationLoop = () => {
+      if (!active || listening) return;
+      listening = true;
       setSaathiStep(1);
-      startListening((transcript) => {
+      setSaathiTranscript(''); // Clear transcript before listening
+      setSaathiResponse(''); // Clear response before listening
+      startListening(async (transcript) => {
+        if (!active) { listening = false; return; }
+        listening = false;
+        setSaathiStep(1);
         setSaathiTranscript(transcript);
-        // Simple mock responses for demo
-        let response = '';
-        if (/kharcha|kamaya|earn|expense/i.test(transcript)) {
-          response = 'Aapne aaj 1200 rupaye kamaye, kharcha 300 tha, bacha 900 rupaye.';
-        } else if (/penalty|reward|late|delay/i.test(transcript)) {
-          response = 'Penalty 50 rupaye lagayi gayi kyunki delivery 30 minute late thi.';
-        } else if (/business|behtar|better|growth|pichle hafte/i.test(transcript)) {
-          response = 'Aapka business pichle hafte se 10% behtar hai.';
-        } else {
-          response = 'Maaf kijiye, main aapka sawaal samajh nahi paaya. Kripya dobara poochhein.';
+        // Check for empty or unclear transcript
+        if (!transcript || transcript.trim().length < 3) {
+          const msg = 'Kripya apna sawaal saaf taur par poochhein.';
+          setSaathiResponse(msg);
+          speak(msg, () => {
+            setSaathiStep(2);
+            setTimeout(() => { if (active) conversationLoop(); }, 1000);
+          });
+          return;
         }
-        setSaathiResponse(response);
-        speak(response, () => {
-          setSaathiStep(2);
-          setTimeout(() => setShowSaathi(false), 5000);
-        });
-      }, () => {});
-    });
+        try {
+          const contextStr = JSON.stringify(DRIVER_CONTEXT);
+          const prompt = `Tum Porter Saathi ho — ek dostana, simple Hindi bolne wala AI assistant. Driver ki madad karo unke business samajhne mein. Always: short, clear Hindi + thoda encouragement. Numbers ko tod kar samjhao (earnings - expenses = net). Avoid technical shabd, use simple language. Use ONLY this CONTEXT for answers: ${contextStr}\nUser: ${transcript}`;
+          const geminiRes = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          });
+          const geminiData = await geminiRes.json();
+          const geminiReply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Maaf kijiye, main aapka sawaal samajh nahi paaya.';
+          setSaathiResponse(geminiReply);
+          speak(geminiReply, () => {
+            setSaathiStep(2);
+            setTimeout(() => { if (active) conversationLoop(); }, 1000);
+          });
+        } catch (err) {
+          setSaathiResponse('AI se sampark nahi ho paaya. Kripya dobara koshish karein.');
+          speak('AI se sampark nahi ho paaya. Kripya dobara koshish karein.', () => {
+            setSaathiStep(2);
+            setTimeout(() => { if (active) conversationLoop(); }, 1000);
+          });
+        }
+      }, () => { listening = false; });
+    };
+    speak('Namaste! "', conversationLoop);
   };
+
+// Mock driver context for Saathi assistant
+const DRIVER_CONTEXT = {
+  profile: {
+    name: "Ramesh Kumar",
+    city: "Bangalore",
+    joined_date: "2023-08-15",
+    vehicle: { type: "Bike", model: "Honda Shine", registration: "KA-01-AB-1234" },
+    rating: 4.78,
+    phone: "+91-98xxxxxx45"
+  },
+  earnings: {
+    "2025-09-12": {
+      total_earnings: 1800,
+      expenses: { fuel: 300, commission: 100, toll: 50 },
+      net_earnings: 1350,
+      completed_trips: 12,
+      cash_collected: 900,
+      wallet_balance: 450
+    },
+    "2025-09-13": {
+      total_earnings: 2150,
+      expenses: { fuel: 350, commission: 110, parking: 30 },
+      net_earnings: 1660,
+      completed_trips: 15,
+      cash_collected: 1200,
+      wallet_balance: 520
+    },
+    "2025-09-14": {
+      total_earnings: 1620,
+      expenses: { fuel: 280, commission: 95 },
+      net_earnings: 1245,
+      completed_trips: 11,
+      cash_collected: 700,
+      wallet_balance: 420
+    }
+  },
+  penalties: [
+    { id: "PEN_01", reason: "Late Delivery", amount: 50, details: "30 min delay" },
+    { id: "PEN_02", reason: "Helmet Not Worn", amount: 100, details: "Warned by traffic cam" }
+  ],
+  rewards: [
+    { id: "REW_01", reason: "Weekly Target Achieved", amount: 200, details: "Completed 60 trips this week" },
+    { id: "REW_02", reason: "5-Star Streak", amount: 150, details: "10 consecutive 5-star ratings" }
+  ],
+  shifts: [
+    { date: "2025-09-12", start: "08:00", end: "18:00" },
+    { date: "2025-09-13", start: "09:00", end: "17:00" }
+  ],
+  goals: {
+    weekly_trips_target: 70,
+    weekly_trips_done: 33,
+    weekly_earnings_target: 9000
+  }
+};
 
   const handleSend = async () => {
     setLoading(true);
@@ -129,7 +240,6 @@ function Home() {
       <Typography variant="h5" fontWeight={600} mb={1}>Home</Typography>
       <Typography mb={3}>Welcome to Porter App!</Typography>
       <Box mt={2}>
-        <Typography variant="subtitle1" fontWeight={500}>AI Chat Demo</Typography>
         <Box display="flex" gap={1} mt={1}>
           <input
             type="text"
